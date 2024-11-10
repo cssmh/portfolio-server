@@ -8,6 +8,7 @@ const port = 5000;
 app.use(
   cors({
     origin: [
+      "http://localhost:5173",
       "https://momin-hossain.vercel.app",
       "https://momin-hossain.netlify.app",
     ],
@@ -26,8 +27,8 @@ const client = new MongoClient(process.env.URI, {
 
 async function run() {
   try {
-    const portCollection = client.db("Portfolio").collection("Users");
-    const messageCollection = client.db("Portfolio").collection("Message");
+    const portCollection = client.db("Portfolio").collection("visitors");
+    const messageCollection = client.db("Portfolio").collection("message");
 
     app.get(process.env.USERS, async (req, res) => {
       try {
