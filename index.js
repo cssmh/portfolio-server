@@ -1,14 +1,13 @@
 const express = require("express");
 const cors = require("cors");
 const app = express();
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const router = require("./routes/Routes");
 require("dotenv").config();
 const port = 5000;
 
 app.use(
   cors({
     origin: [
-      "http://localhost:5173",
       "https://momin-hossain.vercel.app",
       "https://momin-hossain.netlify.app",
     ],
@@ -16,82 +15,17 @@ app.use(
   })
 );
 app.use(express.json());
+app.use(router);
 
-const client = new MongoClient(process.env.URI, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  },
-});
-
-async function run() {
-  try {
-    const portCollection = client.db("Portfolio").collection("visitors");
-    const messageCollection = client.db("Portfolio").collection("message");
-
-    app.get(process.env.USERS, async (req, res) => {
-      try {
-        const result = await portCollection
-          .find()
-          .sort({ lastVisited: -1 })
-          .toArray();
-        res.send(result);
-      } catch (error) {
-        console.log(error);
-      }
-    });
-
-    app.post(process.env.COUNT, async (req, res) => {
-      const {
-        name,
-        deviceType,
-        browser,
-        userAgent,
-        lastVisited,
-        sessionId,
-        screenResolution,
-        windowSize,
-      } = req.body;
-
-      try {
-        const result = await portCollection.updateOne(
-          { name, sessionId }, // Track unique visits with sessionId
-          {
-            $inc: { count: 1 },
-            $set: {
-              lastVisited,
-              deviceType,
-              browser,
-              userAgent,
-              screenResolution,
-              windowSize,
-            },
-          },
-          { upsert: true }
-        );
-        res.send(result);
-      } catch (err) {
-        console.log(err);
-      }
-    });
-
-    app.post(process.env.MESSAGE, async (req, res) => {
-      try {
-        const result = await messageCollection.insertOne(req.body);
-        res.send(result);
-      } catch (err) {
-        console.log(err);
-      }
-    });
-
-    await client.db("admin").command({ ping: 1 });
-    // console.log("Pinged your deployment. Successfully connected to MongoDB!");
-  } finally {
-    // await client.close();
-  }
-}
-run().catch(console.dir);
+// async function run() {
+//   try {
+//     await client.db("admin").command({ ping: 1 });
+//     console.log("Pinged your deployment. Successfully connected to MongoDB!");
+//   } finally {
+//     // await client.close();
+//   }
+// }
+// run().catch(console.dir);
 
 app.get("/", (req, res) => {
   res.send("Welcome to Portfolio Server");
