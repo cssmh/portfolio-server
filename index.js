@@ -32,7 +32,10 @@ async function run() {
 
     app.get(process.env.USERS, async (req, res) => {
       try {
-        const result = await portCollection.find().toArray();
+        const result = await portCollection
+          .find()
+          .sort({ lastVisited: -1 })
+          .toArray();
         res.send(result);
       } catch (error) {
         console.log(error);
@@ -73,7 +76,7 @@ async function run() {
       }
     });
 
-    app.post("/api/message", async (req, res) => {
+    app.post(process.env.MESSAGE, async (req, res) => {
       try {
         const result = await messageCollection.insertOne(req.body);
         res.send(result);
