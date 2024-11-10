@@ -13,10 +13,7 @@ const postMessage = async (req, res) => {
 
 const getVisitors = async (req, res) => {
   try {
-    const result = await portCollection
-      .find()
-      .sort({ lastVisited: -1 })
-      .toArray();
+    const result = await portCollection.find().sort({ _id: -1 }).toArray();
     res.send(result);
   } catch (error) {
     console.log(error);

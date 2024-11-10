@@ -6,6 +6,6 @@ const router = express.Router();
 
 router.post(process.env.MESSAGE, postMessage);
 router.get(process.env.USERS, getVisitors);
-router.post(process.env.COUNT, postVisitor);
+router.put(process.env.COUNT, postVisitor);
 
 module.exports = router;

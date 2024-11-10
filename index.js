@@ -3,11 +3,12 @@ const cors = require("cors");
 const app = express();
 const router = require("./routes/Routes");
 require("dotenv").config();
-const port = 5000;
+const port = process.env.PORT;
 
 app.use(
   cors({
     origin: [
+      "http://localhost:5173",
       "https://momin-hossain.vercel.app",
       "https://momin-hossain.netlify.app",
     ],
