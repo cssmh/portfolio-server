@@ -25,30 +25,27 @@ const postVisitor = async (req, res) => {
     name,
     deviceType,
     browser,
-    userAgent,
     sessionId,
     lastVisited,
     screenResolution,
-    windowSize,
-    deviceName,
   } = req.body;
 
   try {
     const result = await portCollection.updateOne(
-      { name, deviceType, browser, userAgent, sessionId, deviceName },
+      { name, deviceType, browser, sessionId },
       {
         $inc: { count: 1 },
         $set: {
           lastVisited,
           screenResolution,
-          windowSize,
         },
       },
       { upsert: true }
     );
+
     res.send(result);
   } catch (err) {
-    console.error("Error in postVisitor:", err);
+    console.log("Error in postVisitor:", err);
   }
 };
 
