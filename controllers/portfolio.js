@@ -27,21 +27,17 @@ const postVisitor = async (req, res) => {
     browser,
     userAgent,
     lastVisited,
-    sessionId,
     screenResolution,
     windowSize,
   } = req.body;
 
   try {
     const result = await portCollection.updateOne(
-      { name, sessionId }, // Track unique visits with sessionId
+      { name, deviceType, browser, userAgent }, // Track unique visits with a device/browser combo
       {
         $inc: { count: 1 },
         $set: {
           lastVisited,
-          deviceType,
-          browser,
-          userAgent,
           screenResolution,
           windowSize,
         },
