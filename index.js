@@ -8,9 +8,9 @@ const port = process.env.PORT;
 app.use(
   cors({
     origin: [
-      "http://localhost:5173",
+      "http://localhost:3000",
+      "https://mominhossain.vercel.app",
       "https://momin-hossain.vercel.app",
-      "https://momin-hossain.netlify.app",
     ],
     credentials: true,
   })
@@ -19,9 +19,24 @@ app.use(express.json());
 app.use(router);
 
 app.get("/", (req, res) => {
-  res.send("Welcome to Md. Momin Hossain Portfolio Server");
+  const currentTime = new Date().toLocaleString("en-BD", {
+    timeZone: "Asia/Dhaka",
+    weekday: "short",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
+    hour12: true,
+  });
+
+  res.send(`
+    Momin's Portfolio Server is running smoothly<br>
+    Today: ${currentTime}
+  `);
 });
 
 app.listen(port, () => {
-  console.log(`CRUD IS RUNNING ON PORT ${port}`);
+  console.log(`Portfolio is running on http://localhost:${port}`);
 });
