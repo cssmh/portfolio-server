@@ -1,7 +1,6 @@
 const express = require("express");
 require("dotenv").config();
 const { postMessage, getVisitors, postVisitor } = require("../controllers/portfolio");
-
 const router = express.Router();
 
 router.post(process.env.MESSAGE, postMessage);
