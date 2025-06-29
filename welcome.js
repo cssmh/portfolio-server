@@ -23,165 +23,165 @@ welcomeRoute.get("/", (req, res) => {
       <meta name="viewport" content="width=device-width,initial-scale=1.0" />
       <title>Momin's Portfolio Server</title>
       <style>
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap');
         body {
-          background: linear-gradient(135deg, #181824 0%, #8d153a 100%);
-          font-family: 'Montserrat',sans-serif;
           min-height: 100vh;
           margin: 0;
-          padding: 0;
           display: flex;
           align-items: center;
           justify-content: center;
-          color: #f8f8fa;
+          background: linear-gradient(120deg, #232526 0%, #e42265 100%);
+          font-family: 'Quicksand', sans-serif;
+          overflow: hidden;
         }
-        .circles {
-          position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none;
+        .background-svg {
+          position: fixed;
+          top: 0; left: 0;
+          width: 100vw;
+          height: 100vh;
+          z-index: 0;
+          pointer-events: none;
         }
-        .circles li {
-          position: absolute; display: block; list-style: none;
-          width: 12px; height: 12px;
-          background: rgba(255,255,255,0.07);
-          animation: animate 18s linear infinite;
-          bottom: -100px; border-radius: 50%;
+        .hexagon {
+          animation: floatHex 12s ease-in-out infinite alternate;
+          opacity: 0.23;
         }
-        .circles li:nth-child(1) { left: 20%; width: 32px; height: 32px; animation-delay: 0s; }
-        .circles li:nth-child(2) { left: 12%; width: 12px; height: 12px; animation-delay: 2s; animation-duration: 9s;}
-        .circles li:nth-child(3) { left: 70%; width: 14px; height: 14px; animation-delay: 3s;}
-        .circles li:nth-child(4) { left: 42%; width: 22px; height: 22px; animation-delay: 0s; animation-duration: 13s;}
-        .circles li:nth-child(5) { left: 65%; width: 10px; height: 10px; animation-delay: 1s;}
-        .circles li:nth-child(6) { left: 75%; width: 40px; height: 40px; animation-delay: 2s;}
-        .circles li:nth-child(7) { left: 35%; width: 54px; height: 54px; animation-delay: 5s;}
-        .circles li:nth-child(8) { left: 50%; width: 15px; height: 15px; animation-delay: 10s; animation-duration: 25s;}
-        .circles li:nth-child(9) { left: 15%; width: 9px; height: 9px; animation-delay: 1s; animation-duration: 19s;}
-        .circles li:nth-child(10) { left: 82%; width: 44px; height: 44px; animation-delay: 0s; animation-duration: 8s;}
-        @keyframes animate {
-          0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-          100% { transform: translateY(-700px) rotate(360deg); opacity: 0; }
+        .hexagon:nth-child(2) { animation-delay: 2s; opacity: 0.18; }
+        .hexagon:nth-child(3) { animation-delay: 4s; opacity: 0.13; }
+        .hexagon:nth-child(4) { animation-delay: 6s; opacity: 0.25; }
+        .hexagon:nth-child(5) { animation-delay: 8s; opacity: 0.21; }
+        .hexagon:nth-child(6) { animation-delay: 10s; opacity: 0.12; }
+        @keyframes floatHex {
+          0%   { transform: translateY(0) scale(1) rotate(0deg);}
+          100% { transform: translateY(-90px) scale(1.12) rotate(7deg);}
         }
-        .container {
-          text-align: center;
+        .mainbox {
           position: relative;
           z-index: 1;
-          padding: 1.3rem 1.2rem 1.2rem 1.2rem;
-          background: rgba(255,255,255,0.09);
-          backdrop-filter: blur(7px);
-          border-radius: 16px;
-          box-shadow: 0 10px 28px rgba(24,24,36,0.12);
-          border: 1px solid rgba(255,255,255,0.13);
-          max-width: 340px;
-          width: 100%;
-          margin: 0 auto;
+          width: 330px;
+          background: rgba(255,255,255,0.12);
+          backdrop-filter: blur(11px);
+          border-radius: 22px;
+          box-shadow: 0 6px 40px rgba(36,19,52,0.23);
+          border: 1px solid rgba(255,255,255,0.14);
+          padding: 1.2rem 1.05rem 1.25rem 1.05rem;
+          text-align: center;
+          transition: box-shadow 0.3s;
         }
-        .status {
+        .mainbox:hover {
+          box-shadow: 0 9px 60px 0 rgba(228,34,101,0.27);
+        }
+        .badge {
           display: inline-block;
-          margin-bottom: .7rem;
-          padding: .19rem .9rem;
-          background: linear-gradient(90deg,#e62245 0%,#b3123a 100%);
+          background: linear-gradient(90deg, #f857a6 0%, #ff5858 100%);
           color: #fff;
-          border-radius: 30px;
-          font-weight: 600;
-          letter-spacing: 0.07em;
-          font-size: .85rem;
-          box-shadow: 0 2px 7px rgba(230,34,69,0.09);
+          padding: 0.2em 0.85em;
+          border-radius: 18px;
+          font-size: .83rem;
+          font-weight: 700;
+          margin-bottom: 0.55em;
+          letter-spacing: 0.06em;
+          box-shadow: 0 2px 7px rgba(230,34,69,0.13);
         }
         h1 {
-          font-size: 1.13rem;
-          margin-bottom: .32rem;
-          background: linear-gradient(90deg,#00dbde 0%,#fc00ff 33%,#e62245 100%);
+          margin: 0 0 0.18em 0;
+          font-size: 1.23rem;
+          background: linear-gradient(90deg,#fff 15%,#e62245 68%,#4e54c8 100%);
           -webkit-background-clip: text;
           background-clip: text;
           color: transparent;
           font-weight: 700;
           letter-spacing: 0.5px;
+          text-shadow: 0 1px 8px rgba(255,255,255,0.12);
+          text-transform: uppercase;
+          letter-spacing: 1px;
         }
         .subtitle {
-          font-size: .9rem;
-          color: #e9e9ef;
-          margin-bottom: .8rem;
-          font-weight: 400;
+          font-size: .94rem;
+          color: #f8e8f6;
+          margin-bottom: .7rem;
+          font-weight: 500;
+          letter-spacing: 0.02em;
         }
-        .divider {
-          width: 31px; height: 2.2px;
-          border-radius: 1px;
-          background: linear-gradient(90deg, #e62245, #fff);
-          margin: 0 auto 0.7rem auto;
-          animation: slide 1.4s infinite alternate cubic-bezier(.5, .2, .2, 1);
+        .wave {
+          display: block;
+          width: 40px;
+          margin: 0.8em auto 1.15em auto;
         }
-        @keyframes slide { from { width: 17px; } to { width: 31px; } }
         .info {
-          font-size: .89rem;
-          color: #c2c4e1;
-          margin-bottom: .75rem;
+          font-size: .88rem;
+          color: #e3e6f3;
+          margin-bottom: .7rem;
+          line-height: 1.5em;
         }
         .cta-row {
-          display: flex;
-          flex-direction: column;
-          gap: .5rem;
-          align-items: center;
-          margin: .7rem 0 0.2rem 0;
+          margin: .8em 0 .18em 0;
         }
         .cta-button {
           display: inline-block;
-          padding: 8px 20px;
-          border-radius: 6px;
-          font-size: .97rem;
+          padding: 7px 20px;
+          border-radius: 7px;
+          font-size: .98rem;
           font-weight: 700;
           text-decoration: none;
-          letter-spacing: 0.04em;
-          box-shadow: 0 3px 10px rgba(230,34,69,0.11);
-          transition: background 0.16s, transform 0.12s;
+          letter-spacing: 0.06em;
           background: linear-gradient(90deg, #e62245 0%, #b3123a 100%);
           color: #fff;
+          transition: background 0.19s, transform 0.12s;
+          box-shadow: 0 4px 15px rgba(230,34,69,0.09);
+          border: none;
         }
         .cta-button:hover {
           background: linear-gradient(90deg, #b3123a 0%, #e62245 100%);
-          transform: scale(1.025);
+          transform: scale(1.04) rotate(-1deg);
           color: #fff;
-          box-shadow: 0 6px 13px rgba(230,34,69,0.09);
+          box-shadow: 0 9px 30px rgba(230,34,69,0.17);
+        }
+        .today {
+          margin-top: .5em;
+          font-size: .92rem;
+          color: #f3f3fa;
+          font-weight: 600;
+          letter-spacing: .04em;
         }
         .footer {
-          margin-top: 1.1rem;
-          font-size: .85rem;
+          margin-top: .85em;
+          font-size: .82rem;
           color: #e62245;
-          letter-spacing: 0.08em;
+          letter-spacing: 0.09em;
           font-weight: 700;
           text-transform: uppercase;
         }
-        .today {
-          margin-top: .6rem;
-          font-size: .93rem;
-          background: rgba(0,0,0,0.07);
-          color: #fff;
-          font-weight: 600;
-          border-radius: 7px;
-          padding: 5px 0;
-          letter-spacing: .04em;
-        }
-        @media (max-width: 450px) {
-          .container { padding: .7rem .25rem; }
-          h1 { font-size: .99rem; }
+        /* Responsive */
+        @media (max-width: 500px) {
+          .mainbox { padding: .7rem .15rem; max-width: 99vw; }
+          h1 { font-size: 1.09rem; }
         }
       </style>
     </head>
     <body>
-      <ul class="circles">
-        <li></li><li></li><li></li><li></li><li></li>
-        <li></li><li></li><li></li><li></li><li></li>
-      </ul>
-      <div class="container">
-        <div class="status">SERVER RUNNING</div>
+      <svg class="background-svg" width="100vw" height="100vh">
+        <polygon class="hexagon" points="80,20 100,40 100,70 80,90 60,70 60,40" fill="#fff" style="top:15vh;left:8vw;position:absolute;width:70px;height:70px;" />
+        <polygon class="hexagon" points="270,60 290,80 290,110 270,130 250,110 250,80" fill="#e62245" style="top:60vh;left:19vw;position:absolute;width:60px;height:60px;" />
+        <polygon class="hexagon" points="520,180 540,200 540,230 520,250 500,230 500,200" fill="#fff" style="top:35vh;left:75vw;position:absolute;width:55px;height:55px;" />
+        <polygon class="hexagon" points="390,110 410,130 410,160 390,180 370,160 370,130" fill="#b3123a" style="top:80vh;left:67vw;position:absolute;width:40px;height:40px;" />
+        <polygon class="hexagon" points="690,280 710,300 710,330 690,350 670,330 670,300" fill="#ffb88c" style="top:18vh;left:55vw;position:absolute;width:32px;height:32px;" />
+        <polygon class="hexagon" points="60,200 80,220 80,250 60,270 40,250 40,220" fill="#e62245" style="top:75vh;left:10vw;position:absolute;width:38px;height:38px;" />
+      </svg>
+      <div class="mainbox">
+        <div class="badge">ONLINE</div>
         <h1>Momin's Portfolio Server</h1>
-        <div class="subtitle">Welcome to the <b>Backend API</b> of <b>Momin Hossain</b></div>
-        <div class="divider"></div>
+        <div class="subtitle">Hello! You're at the home of<br><b>Momin Hossain's API</b></div>
+        <svg class="wave" viewBox="0 0 44 12" fill="none"><path d="M2 10C6 6 10 6 14 10C18 14 22 14 26 10C30 6 34 6 38 10" stroke="#e62245" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
         <div class="info">
-          Portfolio API is healthy &amp; live.<br>
+          The API is running smoothly.<br>
+          <span style="color:#fff;font-weight:600;">Welcome!</span>
         </div>
         <div class="cta-row">
           <a href="https://momin-hossain.vercel.app" class="cta-button" target="_blank" rel="noopener">Visit Portfolio</a>
         </div>
         <div class="today" id="live-time">${initialTime}</div>
-        <div class="footer">&copy; ${currentYear} Momin Hossain. All rights reserved.</div>
+        <div class="footer">&copy; ${currentYear} Momin Hossain.</div>
       </div>
       <script>
         function updateTime() {
