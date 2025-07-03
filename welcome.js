@@ -22,7 +22,6 @@ welcomeRoute.get("/", (req, res) => {
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width,initial-scale=1.0" />
       <title>Momin's Portfolio Server</title>
-      <link rel="icon" href="/favicon.ico" type="image/x-icon" />
       <style>
         @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap');
         body {
@@ -31,184 +30,152 @@ welcomeRoute.get("/", (req, res) => {
           display: flex;
           align-items: center;
           justify-content: center;
-          background: #16161a;
+          background: linear-gradient(120deg, #232526 0%, #e42265 100%);
           font-family: 'Quicksand', sans-serif;
           overflow: hidden;
         }
-        /* Animated Gradient Circles */
-        .bg-anim {
+        .background-svg {
           position: fixed;
+          top: 0; left: 0;
           width: 100vw;
           height: 100vh;
-          top: 0; left: 0;
-          overflow: hidden;
           z-index: 0;
+          pointer-events: none;
         }
-        .circle {
-          position: absolute;
-          border-radius: 50%;
-          filter: blur(60px);
-          opacity: 0.45;
-          animation: move-circles 18s ease-in-out infinite alternate;
+        .hexagon {
+          animation: floatHex 12s ease-in-out infinite alternate;
+          opacity: 0.23;
         }
-        .circle1 {
-          width: 360px; height: 360px;
-          top: -80px; left: -60px;
-          background: radial-gradient(circle at 60% 50%, #e42265 65%, #3a125c 100%);
-          animation-delay: 0s;
+        .hexagon:nth-child(2) { animation-delay: 2s; opacity: 0.18; }
+        .hexagon:nth-child(3) { animation-delay: 4s; opacity: 0.13; }
+        .hexagon:nth-child(4) { animation-delay: 6s; opacity: 0.25; }
+        .hexagon:nth-child(5) { animation-delay: 8s; opacity: 0.21; }
+        .hexagon:nth-child(6) { animation-delay: 10s; opacity: 0.12; }
+        @keyframes floatHex {
+          0%   { transform: translateY(0) scale(1) rotate(0deg);}
+          100% { transform: translateY(-90px) scale(1.12) rotate(7deg);}
         }
-        .circle2 {
-          width: 220px; height: 220px;
-          top: 60vh; left: 68vw;
-          background: radial-gradient(circle at 60% 30%, #4e54c8 60%, #22223b 100%);
-          animation-delay: 6s;
-        }
-        .circle3 {
-          width: 180px; height: 230px;
-          top: 48vh; left: 18vw;
-          background: radial-gradient(circle at 40% 60%, #00c3ff 60%, #16161a 100%);
-          opacity: 0.28;
-          animation-delay: 3s;
-        }
-        .circle4 {
-          width: 120px; height: 120px;
-          top: 10vh; left: 75vw;
-          background: radial-gradient(circle at 50% 50%, #f7971e 60%, #ffd200 100%);
-          opacity: 0.19;
-          animation-delay: 9s;
-        }
-        .circle5 {
-          width: 90px; height: 90px;
-          top: 78vh; left: 12vw;
-          background: radial-gradient(circle at 45% 40%, #e42265 70%, #ffb88c 100%);
-          opacity: 0.26;
-          animation-delay: 13s;
-        }
-        @keyframes move-circles {
-          0%   { transform: scale(1) translateY(0);}
-          100% { transform: scale(1.12) translateY(-60px);}
-        }
-        /* Glass Card */
         .mainbox {
           position: relative;
           z-index: 1;
-          width: 390px;
-          background: rgba(34, 33, 44, 0.82);
-          backdrop-filter: blur(16px) saturate(1.22);
-          border-radius: 28px;
-          box-shadow: 0 8px 60px 0 rgba(59,18,70,0.27);
-          border: 1px solid rgba(255,255,255,0.07);
-          padding: 2.1rem 1.6rem 1.8rem 1.6rem;
+          width: 330px;
+          background: rgba(255,255,255,0.12);
+          backdrop-filter: blur(11px);
+          border-radius: 22px;
+          box-shadow: 0 6px 40px rgba(36,19,52,0.23);
+          border: 1px solid rgba(255,255,255,0.14);
+          padding: 1.2rem 1.05rem 1.25rem 1.05rem;
           text-align: center;
           transition: box-shadow 0.3s;
         }
         .mainbox:hover {
-          box-shadow: 0 15px 55px 0 rgba(228,34,101,0.35);
+          box-shadow: 0 9px 60px 0 rgba(228,34,101,0.27);
         }
         .badge {
           display: inline-block;
-          background: linear-gradient(90deg, #00c3ff 0%, #e42265 100%);
+          background: linear-gradient(90deg, #f857a6 0%, #ff5858 100%);
           color: #fff;
-          padding: 0.28em 1.18em;
-          border-radius: 21px;
-          font-size: .95rem;
+          padding: 0.2em 0.85em;
+          border-radius: 18px;
+          font-size: .83rem;
           font-weight: 700;
-          margin-bottom: 0.85em;
-          letter-spacing: 0.09em;
-          box-shadow: 0 2px 8px rgba(230,34,69,0.18);
-          border: 1.5px solid #ffffff22;
+          margin-bottom: 0.55em;
+          letter-spacing: 0.06em;
+          box-shadow: 0 2px 7px rgba(230,34,69,0.13);
         }
         h1 {
-          margin: 0 0 0.28em 0;
-          font-size: 1.45rem;
-          background: linear-gradient(90deg,#fff 15%,#e42245 68%,#00c3ff 100%);
+          margin: 0 0 0.18em 0;
+          font-size: 1.23rem;
+          background: linear-gradient(90deg,#fff 15%,#e62245 68%,#4e54c8 100%);
           -webkit-background-clip: text;
           background-clip: text;
           color: transparent;
-          font-weight: 800;
-          letter-spacing: 1.2px;
-          text-shadow: 0 1px 8px rgba(255,255,255,0.08);
+          font-weight: 700;
+          letter-spacing: 0.5px;
+          text-shadow: 0 1px 8px rgba(255,255,255,0.12);
           text-transform: uppercase;
+          letter-spacing: 1px;
         }
         .subtitle {
-          font-size: 1.11rem;
-          color: #d6e3f7;
-          margin-bottom: 1.05rem;
-          font-weight: 700;
-          letter-spacing: 0.06em;
+          font-size: .94rem;
+          color: #f8e8f6;
+          margin-bottom: .7rem;
+          font-weight: 500;
+          letter-spacing: 0.02em;
         }
         .wave {
           display: block;
-          width: 50px;
-          margin: 1.2em auto 1.3em auto;
+          width: 40px;
+          margin: 0.8em auto 1.15em auto;
         }
         .info {
-          font-size: 1.01rem;
-          color: #f4f4fa;
-          margin-bottom: 1.1rem;
-          line-height: 1.58em;
+          font-size: .88rem;
+          color: #e3e6f3;
+          margin-bottom: .7rem;
+          line-height: 1.5em;
         }
         .cta-row {
-          margin: 1.23em 0 .23em 0;
+          margin: .8em 0 .18em 0;
         }
         .cta-button {
           display: inline-block;
-          padding: 12px 35px;
-          border-radius: 11px;
-          font-size: 1.05rem;
-          font-weight: 800;
+          padding: 7px 20px;
+          border-radius: 7px;
+          font-size: .98rem;
+          font-weight: 700;
           text-decoration: none;
-          letter-spacing: 0.08em;
-          background: linear-gradient(90deg, #e42245 0%, #00c3ff 100%);
+          letter-spacing: 0.06em;
+          background: linear-gradient(90deg, #e62245 0%, #b3123a 100%);
           color: #fff;
-          transition: background 0.18s, transform 0.10s;
-          box-shadow: 0 5px 16px rgba(34,34,34,0.10);
+          transition: background 0.19s, transform 0.12s;
+          box-shadow: 0 4px 15px rgba(230,34,69,0.09);
           border: none;
         }
         .cta-button:hover {
-          background: linear-gradient(90deg, #00c3ff 0%, #e42245 100%);
-          transform: scale(1.055) rotate(-1deg);
+          background: linear-gradient(90deg, #b3123a 0%, #e62245 100%);
+          transform: scale(1.04) rotate(-1deg);
           color: #fff;
-          box-shadow: 0 10px 32px rgba(34,34,34,0.13);
+          box-shadow: 0 9px 30px rgba(230,34,69,0.17);
         }
         .today {
-          margin-top: .9em;
-          font-size: 1.01rem;
-          color: #dbeafe;
-          font-weight: 700;
-          letter-spacing: .05em;
+          margin-top: .5em;
+          font-size: .92rem;
+          color: #f3f3fa;
+          font-weight: 600;
+          letter-spacing: .04em;
         }
         .footer {
-          margin-top: 1.2em;
-          font-size: .92rem;
-          color: #e42245;
-          letter-spacing: 0.13em;
-          font-weight: 800;
+          margin-top: .85em;
+          font-size: .82rem;
+          color: #e62245;
+          letter-spacing: 0.09em;
+          font-weight: 700;
           text-transform: uppercase;
         }
         /* Responsive */
         @media (max-width: 500px) {
-          .mainbox { padding: .85rem .14rem; max-width: 99vw; }
-          h1 { font-size: 1.18rem; }
+          .mainbox { padding: .7rem .15rem; max-width: 99vw; }
+          h1 { font-size: 1.09rem; }
         }
       </style>
     </head>
     <body>
-      <div class="bg-anim">
-        <div class="circle circle1"></div>
-        <div class="circle circle2"></div>
-        <div class="circle circle3"></div>
-        <div class="circle circle4"></div>
-        <div class="circle circle5"></div>
-      </div>
+      <svg class="background-svg" width="100vw" height="100vh">
+        <polygon class="hexagon" points="80,20 100,40 100,70 80,90 60,70 60,40" fill="#fff" style="top:15vh;left:8vw;position:absolute;width:70px;height:70px;" />
+        <polygon class="hexagon" points="270,60 290,80 290,110 270,130 250,110 250,80" fill="#e62245" style="top:60vh;left:19vw;position:absolute;width:60px;height:60px;" />
+        <polygon class="hexagon" points="520,180 540,200 540,230 520,250 500,230 500,200" fill="#fff" style="top:35vh;left:75vw;position:absolute;width:55px;height:55px;" />
+        <polygon class="hexagon" points="390,110 410,130 410,160 390,180 370,160 370,130" fill="#b3123a" style="top:80vh;left:67vw;position:absolute;width:40px;height:40px;" />
+        <polygon class="hexagon" points="690,280 710,300 710,330 690,350 670,330 670,300" fill="#ffb88c" style="top:18vh;left:55vw;position:absolute;width:32px;height:32px;" />
+        <polygon class="hexagon" points="60,200 80,220 80,250 60,270 40,250 40,220" fill="#e62245" style="top:75vh;left:10vw;position:absolute;width:38px;height:38px;" />
+      </svg>
       <div class="mainbox">
-        <div class="badge">API ONLINE</div>
+        <div class="badge">ONLINE</div>
         <h1>Momin's Portfolio Server</h1>
-        <div class="subtitle">Welcome to <b>Momin Hossain's API</b></div>
-        <svg class="wave" viewBox="0 0 44 12" fill="none"><path d="M2 10C6 6 10 6 14 10C18 14 22 14 26 10C30 6 34 6 38 10" stroke="#e42245" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+        <div class="subtitle">Hello! You're at the home of<br><b>Momin Hossain's API</b></div>
+        <svg class="wave" viewBox="0 0 44 12" fill="none"><path d="M2 10C6 6 10 6 14 10C18 14 22 14 26 10C30 6 34 6 38 10" stroke="#e62245" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
         <div class="info">
-          The API is <b style="color:#fff;">running smoothly</b>.<br/>
-          <span style="color:#fff;font-weight:700;">All systems operational.</span>
+          The API is running smoothly.<br>
+          <span style="color:#fff;font-weight:600;">Welcome!</span>
         </div>
         <div class="cta-row">
           <a href="https://momin-hossain.vercel.app" class="cta-button" target="_blank" rel="noopener">Visit Portfolio</a>
