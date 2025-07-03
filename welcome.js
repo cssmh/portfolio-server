@@ -1,175 +1,139 @@
 const express = require("express");
-const welcomeRoute = express.Router();
+const welcome = express.Router();
 
-welcomeRoute.get("/", (req, res) => {
-  const initialTime = new Date().toLocaleString("en-BD", {
-    timeZone: "Asia/Dhaka",
-    weekday: "short",
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: true,
-  });
-
+welcome.get("/", (req, res) => {
   const currentYear = new Date().getFullYear();
 
-  res.send(`
-<!DOCTYPE html>
+  res.send(`<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Momin's Portfolio Server</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Matrix API Server | Momin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@600&display=swap" rel="stylesheet">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@500;700&display=swap');
-
-    * {
+    html, body {
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
+      background: black;
+      overflow: hidden;
+      font-family: 'Share Tech Mono', monospace;
+      color: #00ff9f;
     }
 
-    body {
-      font-family: 'Inter', sans-serif;
-      background: #0e0e2c;
-      color: white;
-      overflow: hidden;
+    canvas {
+      position: fixed;
+      top: 0; left: 0;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 2;
+      height: 100vh;
+      width: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
-      height: 100vh;
-      position: relative;
-    }
-
-    .blob {
-      position: absolute;
-      width: 400px;
-      height: 400px;
-      background: radial-gradient(circle at 30% 30%, #ff2d75, transparent);
-      border-radius: 50%;
-      filter: blur(120px);
-      animation: float 20s infinite ease-in-out alternate;
-      opacity: 0.6;
-    }
-
-    .blob:nth-child(2) {
-      top: 20%;
-      left: 60%;
-      background: radial-gradient(circle at 30% 30%, #4e54c8, transparent);
-      animation-delay: 10s;
-    }
-
-    @keyframes float {
-      0% { transform: translateY(0) scale(1); }
-      100% { transform: translateY(-80px) scale(1.1); }
     }
 
     .card {
-      position: relative;
-      z-index: 1;
-      padding: 2.2rem 2rem;
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(14px);
+      background: rgba(0, 255, 159, 0.07);
+      border: 1px solid rgba(0, 255, 159, 0.2);
       border-radius: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 0 60px rgba(255, 45, 117, 0.15);
-      max-width: 360px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 30px rgba(0,255,159,0.2);
+      padding: 2rem 2.5rem;
+      max-width: 600px;
+      width: 92%;
       text-align: center;
+      color: #e0ffee;
     }
 
-    .badge {
-      background: #ff2d75;
-      padding: 4px 18px;
-      border-radius: 30px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      display: inline-block;
+    .typing-title {
+      font-size: 1.4rem;
+      white-space: nowrap;
+      overflow: hidden;
+      border-right: 2px solid #00ff9f;
+      width: 0;
       margin-bottom: 1rem;
+      animation: typing 3s steps(40, end) forwards, blink 0.8s infinite;
     }
 
-    h1 {
-      font-size: 1.6rem;
-      font-weight: 700;
-      background: linear-gradient(to right, #ffffff, #ff2d75, #4e54c8);
-      -webkit-background-clip: text;
-      color: transparent;
-      margin-bottom: 0.6rem;
+    @keyframes typing {
+      from { width: 0; }
+      to { width: 100%; }
+    }
+
+    @keyframes blink {
+      0%, 100% { border-color: transparent; }
+      50% { border-color: #00ff9f; }
     }
 
     .subtitle {
-      font-size: 1rem;
-      color: #e0e0e0;
-      margin-bottom: 1.3rem;
-      line-height: 1.5;
+      font-size: 0.95rem;
+      margin-bottom: 1.2rem;
+      color: #a5ffe7;
     }
 
     .info {
-      font-size: 0.92rem;
-      margin-bottom: 1.3rem;
-      color: #dcdcdc;
+      font-size: 0.88rem;
+      color: #baffef;
+      margin-bottom: 1.5rem;
     }
 
     .cta-button {
-      padding: 10px 24px;
-      background: linear-gradient(to right, #ff2d75, #b3124a);
-      color: #fff;
-      font-weight: bold;
+      padding: 10px 22px;
+      background: #00ff9f;
+      color: #000;
+      border: none;
       border-radius: 8px;
+      font-weight: bold;
       text-decoration: none;
-      box-shadow: 0 4px 20px rgba(255, 45, 117, 0.3);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      transition: all 0.3s ease;
+      display: inline-block;
     }
 
     .cta-button:hover {
-      transform: scale(1.05);
-      box-shadow: 0 8px 28px rgba(255, 45, 117, 0.4);
+      transform: scale(1.04);
+      box-shadow: 0 0 12px #00ff9f;
     }
 
     .time {
       margin-top: 1.2rem;
-      font-size: 0.87rem;
-      color: #f2f2f2;
+      font-size: 0.9rem;
+      color: #a0ffe0;
     }
 
     .footer {
-      margin-top: 1rem;
-      font-size: 0.8rem;
-      color: #ff2d75;
-      letter-spacing: 1px;
+      margin-top: 1.2rem;
+      font-size: 0.75rem;
+      color: #00ffcc;
       font-weight: bold;
+      letter-spacing: 1px;
     }
 
-    @media(max-width: 480px) {
-      .card {
-        padding: 1.6rem 1.3rem;
-        max-width: 90vw;
-      }
+    @media (max-width: 480px) {
+      .card { padding: 1.5rem 1.2rem; }
+      .typing-title { font-size: 1.2rem; }
     }
   </style>
 </head>
 <body>
-  <div class="blob" style="top: 10%; left: 15%;"></div>
-  <div class="blob"></div>
-
-  <div class="card">
-    <div class="badge">🟢 ONLINE</div>
-    <h1>Momin's Portfolio Server</h1>
-    <div class="subtitle">
-      Welcome to <strong>Momin Hossain's</strong><br />Node.js Express API
+  <canvas id="matrix"></canvas>
+  <div class="container">
+    <div class="card">
+      <div class="typing-title">> Welcome to Momin's API Server...</div>
+      <div class="subtitle">Backend online. Express initialized. 🌐</div>
+      <div class="info">You have reached the root of Momin’s <strong>Matrix Dev Portal</strong>.</div>
+      <a class="cta-button" href="https://momin-hossain.vercel.app" target="_blank">Visit Portfolio 🚀</a>
+      <div class="time" id="live-time">📅 Loading BD Time...</div>
+      <div class="footer">© ${currentYear} Momin Hossain</div>
     </div>
-    <div class="info">
-      All systems are running smoothly.<br />
-      You have reached the API welcome page.
-    </div>
-    <a href="https://momin-hossain.vercel.app" class="cta-button" target="_blank">Visit Portfolio</a>
-    <div class="time" id="live-time">${initialTime}</div>
-    <div class="footer">&copy; ${currentYear} Momin Hossain</div>
   </div>
 
   <script>
+    // Live Time
     function updateTime() {
       const options = {
         timeZone: "Asia/Dhaka",
@@ -183,14 +147,47 @@ welcomeRoute.get("/", (req, res) => {
         hour12: true,
       };
       const now = new Date();
-      document.getElementById("live-time").textContent = now.toLocaleString("en-BD", options);
+      document.getElementById("live-time").textContent = "📅 " + now.toLocaleString("en-BD", options);
     }
     setInterval(updateTime, 1000);
     updateTime();
+
+    // Matrix Effect
+    const canvas = document.getElementById("matrix");
+    const ctx = canvas.getContext("2d");
+    canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth;
+
+    const letters = "01";
+    const fontSize = 16;
+    const columns = Math.floor(canvas.width / fontSize);
+    const drops = Array(columns).fill(1);
+
+    function draw() {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#00ff9f";
+      ctx.font = fontSize + "px monospace";
+
+      drops.forEach((y, i) => {
+        const text = letters.charAt(Math.floor(Math.random() * letters.length));
+        const x = i * fontSize;
+        ctx.fillText(text, x, y * fontSize);
+        if (y * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+      });
+    }
+
+    setInterval(draw, 50);
+    window.addEventListener("resize", () => {
+      canvas.height = window.innerHeight;
+      canvas.width = window.innerWidth;
+    });
   </script>
 </body>
-</html>
-  `);
+</html>`);
 });
 
-module.exports = welcomeRoute;
+module.exports = welcome;
