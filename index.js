@@ -8,7 +8,12 @@ const port = process.env.PORT;
 
 app.use(
   cors({
-    origin: ["http://localhost:3000", "https://momin-hossain.vercel.app"],
+    origin: [
+      "http://localhost:3000",
+      "https://momin-hossain.vercel.app",
+      "https://momin-hossain-nextjs-4f13ilhs5-md-momin-hossains-projects.vercel.app",
+      "https://momin-hossain-nextjs-git-main-md-momin-hossains-projects.vercel.app",
+    ],
     credentials: true,
   })
 );
@@ -21,4 +26,3 @@ app.listen(port, () => {
     `🚀 Portfolio is running at: \x1b[36mhttp://localhost:${port}\x1b[0m`
   );
 });
-
