@@ -9,10 +9,7 @@ const port = process.env.PORT;
 app.use(
   cors({
     origin: [
-      "http://localhost:3000",
       "https://momin-hossain.vercel.app",
-      "https://momin-hossain-nextjs-4f13ilhs5-md-momin-hossains-projects.vercel.app",
-      "https://momin-hossain-nextjs-git-main-md-momin-hossains-projects.vercel.app",
     ],
     credentials: true,
   })
