@@ -10,6 +10,7 @@ app.use(
   cors({
     origin: [
       "https://momin-hossain.vercel.app",
+      "https://momin-hossain.netlify.app",
     ],
     credentials: true,
   })
