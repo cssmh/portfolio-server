@@ -11,6 +11,16 @@ const postMessage = async (req, res) => {
   }
 };
 
+const getMessages = async (req, res) => {
+  try {
+    const result = await messageCollection.find().sort({ _id: -1 }).toArray();
+    res.send(result);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({ error: "Failed to fetch messages" });
+  }
+};
+
 const getVisitors = async (req, res) => {
   try {
     const result = await portCollection.find().sort({ _id: -1 }).toArray();
@@ -83,4 +93,4 @@ const postVisitor = async (req, res) => {
   }
 };
 
-module.exports = { postMessage, getVisitors, postVisitor };
+module.exports = { postMessage, getMessages, getVisitors, postVisitor };
