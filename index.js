@@ -1,5 +1,7 @@
 const express = require("express");
 const cors = require("cors");
+const { graphqlHTTP } = require("express-graphql");
+const schema = require("./graphql/schema");
 const app = express();
 const welcome = require("./welcome");
 const portRoutes = require("./routes/Routes");
@@ -18,6 +20,15 @@ app.use(
 app.use(express.json());
 app.use(portRoutes);
 app.use(welcome);
+
+// GraphQL endpoint
+app.use(
+  "/graphql",
+  graphqlHTTP({
+    schema,
+    graphiql: true, // GraphiQL playground enabled
+  })
+);
 
 app.listen(port, () => {
   console.log(
