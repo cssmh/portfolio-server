@@ -8,6 +8,7 @@ const postMessage = async (req, res) => {
     res.send(result);
   } catch (err) {
     console.log(err);
+    res.status(500).send({ error: "Failed to save message" });
   }
 };
 
@@ -23,10 +24,25 @@ const getMessages = async (req, res) => {
 
 const getVisitors = async (req, res) => {
   try {
-    const result = await portCollection.find().sort({ _id: -1 }).toArray();
+    // support optional query params to exclude owner or a sessionId
+    const { excludeSessionId, excludeOwner } = req.query;
+    const filter = {};
+
+    if (excludeSessionId) {
+      filter.sessionId = { $ne: excludeSessionId };
+    }
+    if (excludeOwner === "true") {
+      filter.isOwner = { $ne: true };
+    }
+
+    const result = await portCollection
+      .find(filter)
+      .sort({ _id: -1 })
+      .toArray();
     res.send(result);
   } catch (error) {
     console.log(error);
+    res.status(500).send({ error: "Failed to fetch visitors" });
   }
 };
 
@@ -43,9 +59,9 @@ const postVisitor = async (req, res) => {
     osVersion,
     deviceModel,
     deviceVendor,
+    isOwner,
   } = req.body;
 
-  // Validate required fields
   if (
     !name ||
     !deviceType ||
@@ -61,7 +77,7 @@ const postVisitor = async (req, res) => {
   }
 
   try {
-    // Update or insert the visitor data
+    // Upsert the visitor but also store isOwner flag (if any)
     const result = await portCollection.updateOne(
       { name, deviceType, browser, sessionId },
       {
@@ -74,15 +90,13 @@ const postVisitor = async (req, res) => {
           osVersion,
           deviceModel,
           deviceVendor,
+          sessionId,
+          isOwner: !!isOwner,
         },
       },
       { upsert: true }
     );
 
-    // Log the result for debugging
-    // console.log("Visitor data updated/inserted:", result);
-
-    // Send a structured response
     res.status(200).json({
       success: true,
       message: "Visitor data processed successfully.",
@@ -90,7 +104,35 @@ const postVisitor = async (req, res) => {
     });
   } catch (err) {
     console.error("Error in postVisitor:", err);
+    res.status(500).json({ success: false, error: "Internal server error" });
   }
 };
 
-module.exports = { postMessage, getMessages, getVisitors, postVisitor };
+// Delete records by sessionId (useful to remove owner device entries)
+const deleteVisitorBySession = async (req, res) => {
+  const { sessionId } = req.params;
+  if (!sessionId) {
+    return res
+      .status(400)
+      .json({ success: false, message: "sessionId required" });
+  }
+  try {
+    const result = await portCollection.deleteMany({ sessionId });
+    return res
+      .status(200)
+      .json({ success: true, deletedCount: result.deletedCount });
+  } catch (err) {
+    console.error("Error deleting visitor:", err);
+    return res
+      .status(500)
+      .json({ success: false, error: "Internal server error" });
+  }
+};
+
+module.exports = {
+  postMessage,
+  getMessages,
+  getVisitors,
+  postVisitor,
+  deleteVisitorBySession,
+};
