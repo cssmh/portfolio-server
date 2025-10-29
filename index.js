@@ -11,7 +11,6 @@ const port = process.env.PORT;
 app.use(
   cors({
     origin: [
-      "http://localhost:3000",
       "https://momin-hossain.vercel.app",
       "https://momin-hossain.netlify.app",
     ],
