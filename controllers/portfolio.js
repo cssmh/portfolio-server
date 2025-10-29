@@ -59,6 +59,19 @@ const postVisitor = async (req, res) => {
     osVersion,
     deviceModel,
     deviceVendor,
+    cpuArchitecture,
+    engine,
+    engineVersion,
+    ipAddress,
+    timezone,
+    language,
+    userAgent,
+    isTouchScreen,
+    isMobile,
+    isTablet,
+    isDesktop,
+    colorDepth,
+    pixelRatio,
     isOwner,
   } = req.body;
 
@@ -77,7 +90,6 @@ const postVisitor = async (req, res) => {
   }
 
   try {
-    // Upsert the visitor but also store isOwner flag (if any)
     const result = await portCollection.updateOne(
       { name, deviceType, browser, sessionId },
       {
@@ -90,6 +102,19 @@ const postVisitor = async (req, res) => {
           osVersion,
           deviceModel,
           deviceVendor,
+          cpuArchitecture,
+          engine,
+          engineVersion,
+          ipAddress,
+          timezone,
+          language,
+          userAgent,
+          isTouchScreen,
+          isMobile,
+          isTablet,
+          isDesktop,
+          colorDepth,
+          pixelRatio,
           sessionId,
           isOwner: !!isOwner,
         },
@@ -107,7 +132,6 @@ const postVisitor = async (req, res) => {
     res.status(500).json({ success: false, error: "Internal server error" });
   }
 };
-
 // Delete records by sessionId (useful to remove owner device entries)
 const deleteVisitorBySession = async (req, res) => {
   const { sessionId } = req.params;
