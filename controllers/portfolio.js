@@ -1,6 +1,7 @@
 const client = require("../config/db");
 const portCollection = client.db("Portfolio").collection("visitors");
 const messageCollection = client.db("Portfolio").collection("message");
+const fetch = global.fetch || require("node-fetch"); // Node 18+ has fetch; fallback to node-fetch if needed
 
 const postMessage = async (req, res) => {
   try {
@@ -47,6 +48,8 @@ const getVisitors = async (req, res) => {
 };
 
 const postVisitor = async (req, res) => {
+  const body = req.body || {};
+
   const {
     name,
     deviceType,
@@ -59,8 +62,26 @@ const postVisitor = async (req, res) => {
     osVersion,
     deviceModel,
     deviceVendor,
+    deviceMemory,
+    hardwareConcurrency,
+    cpu,
+    engine,
+    userAgent,
+    platform,
+    languages,
+    language,
+    connection,
+    touchSupport,
+    cookieEnabled,
+    colorDepth,
+    viewportResolution,
+    referrer,
+    timezone,
+    ipFromClient,
     isOwner,
-  } = req.body;
+    routeName,
+    linkType,
+  } = body;
 
   if (
     !name ||
@@ -77,25 +98,79 @@ const postVisitor = async (req, res) => {
   }
 
   try {
-    // Upsert the visitor but also store isOwner flag (if any)
-    const result = await portCollection.updateOne(
-      { name, deviceType, browser, sessionId },
-      {
-        $inc: { count: 1 },
-        $set: {
-          lastVisited,
-          screenResolution,
-          browserVersion,
-          os,
-          osVersion,
-          deviceModel,
-          deviceVendor,
-          sessionId,
-          isOwner: !!isOwner,
-        },
+    // Determine actual request IP (behind proxies via X-Forwarded-For if present)
+    const forwarded = req.headers["x-forwarded-for"];
+    let ip = null;
+    if (forwarded) {
+      // x-forwarded-for could be "client, proxy1, proxy2"
+      ip = Array.isArray(forwarded)
+        ? forwarded[0]
+        : forwarded.split(",")[0].trim();
+    } else if (req.ip) {
+      ip = req.ip;
+    } else if (req.socket && req.socket.remoteAddress) {
+      ip = req.socket.remoteAddress;
+    }
+
+    // attempt to enrich ip with geolocation (use ipapi.co)
+    let geo = null;
+    try {
+      const lookupIp = ip || ipFromClient || "";
+      if (lookupIp) {
+        // ipapi.co endpoint
+        const geoResp = await fetch(`https://ipapi.co/${lookupIp}/json/`);
+        if (geoResp && geoResp.ok) {
+          geo = await geoResp.json();
+        }
+      }
+    } catch (err) {
+      console.warn("Geo lookup failed:", err);
+      geo = null;
+    }
+
+    // Upsert the visitor. Use sessionId as a primary key to identify a device/session reliably
+    const filter = { sessionId };
+    const updateDoc = {
+      $inc: { count: 1 },
+      $set: {
+        name,
+        deviceType,
+        browser,
+        browserVersion,
+        lastVisited,
+        screenResolution,
+        os,
+        osVersion,
+        deviceModel,
+        deviceVendor,
+        deviceMemory,
+        hardwareConcurrency,
+        cpu,
+        engine,
+        userAgent,
+        platform,
+        languages,
+        language,
+        connection,
+        touchSupport,
+        cookieEnabled,
+        colorDepth,
+        viewportResolution,
+        referrer,
+        timezone,
+        ip: ip || ipFromClient || null,
+        ipFromClient: !!ipFromClient,
+        geo,
+        isOwner: !!isOwner,
+        routeName,
+        linkType,
+        updatedAt: new Date(),
       },
-      { upsert: true }
-    );
+    };
+
+    const result = await portCollection.updateOne(filter, updateDoc, {
+      upsert: true,
+    });
 
     res.status(200).json({
       success: true,
