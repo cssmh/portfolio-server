@@ -1,22 +1,45 @@
 const client = require("../config/db");
 const portCollection = client.db("Portfolio").collection("visitors");
 
+(async function ensureIndexes() {
+  try {
+    await portCollection.createIndex({ updatedAt: -1 });
+    // Helpful compound index for common queries (non-unique)
+    await portCollection.createIndex({
+      sessionId: 1,
+      name: 1,
+      deviceType: 1,
+      browser: 1,
+    });
+    console.log("Indexes ensured for visitors collection");
+  } catch (err) {
+    console.error("Error ensuring indexes:", err);
+  }
+})();
+
 const getVisitors = async (req, res) => {
   try {
-    const { excludeSessionId, excludeOwner } = req.query;
+    const { excludeSessionId, excludeOwner, limit, page } = req.query;
     const filter = {};
 
     if (excludeSessionId) {
       filter.sessionId = { $ne: excludeSessionId };
     }
     if (excludeOwner === "true") {
+      // owner flag is boolean in DB
       filter.isOwner = { $ne: true };
     }
 
-    const result = await portCollection
-      .find(filter)
-      .sort({ _id: -1 })
-      .toArray();
+    const pageNum = Math.max(1, parseInt(limit ? page || "1" : "1", 10));
+    const perPage = Math.max(0, parseInt(limit || "0", 10)); // 0 means no limit
+
+    let cursor = portCollection.find(filter).sort({ updatedAt: -1, _id: -1 });
+
+    if (perPage > 0) {
+      cursor = cursor.skip((pageNum - 1) * perPage).limit(perPage);
+    }
+
+    const result = await cursor.toArray();
     res.send(result);
   } catch (error) {
     console.log(error);
@@ -32,6 +55,7 @@ const addVisitor = async (req, res) => {
     browserVersion,
     sessionId,
     lastVisited,
+    lastVisitedISO,
     screenResolution,
     os,
     osVersion,
@@ -53,14 +77,8 @@ const addVisitor = async (req, res) => {
     isOwner,
   } = req.body;
 
-  if (
-    !name ||
-    !deviceType ||
-    !browser ||
-    !sessionId ||
-    !lastVisited ||
-    !screenResolution
-  ) {
+  // Basic required fields
+  if (!name || !deviceType || !browser || !sessionId || !screenResolution) {
     return res.status(400).json({
       success: false,
       message: "Missing required fields in the request body.",
@@ -68,45 +86,75 @@ const addVisitor = async (req, res) => {
   }
 
   try {
-    const result = await portCollection.updateOne(
-      { name, deviceType, browser, sessionId },
-      {
-        $inc: { count: 1 },
-        $set: {
-          lastVisited,
-          screenResolution,
-          browserVersion,
-          os,
-          osVersion,
-          deviceModel,
-          deviceVendor,
-          cpuArchitecture,
-          engine,
-          engineVersion,
-          ipAddress,
-          timezone,
-          language,
-          userAgent,
-          isTouchScreen,
-          isMobile,
-          isTablet,
-          isDesktop,
-          colorDepth,
-          pixelRatio,
-          sessionId,
-          isOwner: !!isOwner,
-        },
+    const now = new Date();
+    const lastVisitedValue =
+      lastVisitedISO ||
+      new Date().toISOString() ||
+      lastVisited ||
+      now.toLocaleString();
+
+    // Key we use to identify a visitor record we want to increment
+    const filter = {
+      name,
+      sessionId,
+      deviceType,
+      browser,
+    };
+
+    const update = {
+      $inc: { count: 1 },
+      $set: {
+        lastVisited: lastVisitedValue,
+        lastVisitedPretty:
+          lastVisited ||
+          new Date(lastVisitedValue).toLocaleString("en-GB", {
+            timeZone: timezone || "UTC",
+            hour12: true,
+          }),
+        updatedAt: now,
+        screenResolution,
+        browserVersion,
+        os,
+        osVersion,
+        deviceModel,
+        deviceVendor,
+        cpuArchitecture,
+        engine,
+        engineVersion,
+        ipAddress,
+        timezone,
+        language,
+        userAgent,
+        isTouchScreen: !!isTouchScreen,
+        isMobile: !!isMobile,
+        isTablet: !!isTablet,
+        isDesktop: !!isDesktop,
+        colorDepth,
+        pixelRatio,
+        sessionId,
+        isOwner: !!isOwner,
       },
-      { upsert: true }
+      $setOnInsert: {
+        createdAt: now,
+      },
+    };
+
+    const options = { upsert: true, returnDocument: "after" };
+
+    const result = await portCollection.findOneAndUpdate(
+      filter,
+      update,
+      options
     );
 
+    // result.value will contain the updated document
     res.status(200).json({
       success: true,
       message: "Visitor data processed successfully.",
-      data: result,
+      data: result.value,
     });
   } catch (err) {
-    console.error("Error in postVisitor:", err);
+    console.error("Error in addVisitor:", err);
     res.status(500).json({ success: false, error: "Internal server error" });
   }
 };
