@@ -4,7 +4,6 @@ const portCollection = client.db("Portfolio").collection("visitors");
 (async function ensureIndexes() {
   try {
     await portCollection.createIndex({ updatedAt: -1 });
-    // Helpful compound index for common queries (non-unique)
     await portCollection.createIndex({
       sessionId: 1,
       name: 1,
@@ -26,12 +25,11 @@ const getVisitors = async (req, res) => {
       filter.sessionId = { $ne: excludeSessionId };
     }
     if (excludeOwner === "true") {
-      // owner flag is boolean in DB
       filter.isOwner = { $ne: true };
     }
 
-    const pageNum = Math.max(1, parseInt(limit ? page || "1" : "1", 10));
-    const perPage = Math.max(0, parseInt(limit || "0", 10)); // 0 means no limit
+    const pageNum = Math.max(1, parseInt(page || "1", 10));
+    const perPage = Math.max(0, parseInt(limit || "0", 10));
 
     let cursor = portCollection.find(filter).sort({ updatedAt: -1, _id: -1 });
 
@@ -42,58 +40,55 @@ const getVisitors = async (req, res) => {
     const result = await cursor.toArray();
     res.send(result);
   } catch (error) {
-    console.log(error);
+    console.error("getVisitors error:", error);
     res.status(500).send({ error: "Failed to fetch visitors" });
   }
 };
 
 const addVisitor = async (req, res) => {
-  const {
-    name,
-    deviceType,
-    browser,
-    browserVersion,
-    sessionId,
-    lastVisited,
-    lastVisitedISO,
-    screenResolution,
-    os,
-    osVersion,
-    deviceModel,
-    deviceVendor,
-    cpuArchitecture,
-    engine,
-    engineVersion,
-    ipAddress,
-    timezone,
-    language,
-    userAgent,
-    isTouchScreen,
-    isMobile,
-    isTablet,
-    isDesktop,
-    colorDepth,
-    pixelRatio,
-    isOwner,
-  } = req.body;
-
-  // Basic required fields
-  if (!name || !deviceType || !browser || !sessionId || !screenResolution) {
-    return res.status(400).json({
-      success: false,
-      message: "Missing required fields in the request body.",
-    });
-  }
-
   try {
-    const now = new Date();
-    const lastVisitedValue =
-      lastVisitedISO ||
-      new Date().toISOString() ||
-      lastVisited ||
-      now.toLocaleString();
+    const body = req.body || {};
 
-    // Key we use to identify a visitor record we want to increment
+    const {
+      name,
+      deviceType,
+      browser,
+      browserVersion,
+      sessionId,
+      lastVisitedISO,
+      screenResolution,
+      os,
+      osVersion,
+      deviceModel,
+      deviceVendor,
+      cpuArchitecture,
+      engine,
+      engineVersion,
+      ipAddress,
+      timezone,
+      language,
+      userAgent,
+      isTouchScreen,
+      isMobile,
+      isTablet,
+      isDesktop,
+      colorDepth,
+      pixelRatio,
+      isOwner,
+      geo, // optional: { latitude, longitude, accuracy }
+    } = body;
+
+    // Required fields
+    if (!name || !deviceType || !browser || !sessionId || !screenResolution) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required fields in the request body.",
+      });
+    }
+
+    const now = new Date();
+    const lastVisitedDate = lastVisitedISO ? new Date(lastVisitedISO) : now;
+
     const filter = {
       name,
       sessionId,
@@ -104,13 +99,17 @@ const addVisitor = async (req, res) => {
     const update = {
       $inc: { count: 1 },
       $set: {
-        lastVisited: lastVisitedValue,
+        lastVisitedISO: lastVisitedDate,
         lastVisitedPretty:
-          lastVisited ||
-          new Date(lastVisitedValue).toLocaleString("en-GB", {
-            timeZone: timezone || "UTC",
-            hour12: true,
-          }),
+          typeof lastVisitedISO === "string"
+            ? new Date(lastVisitedISO).toLocaleString("en-GB", {
+                timeZone: timezone || "UTC",
+                hour12: true,
+              })
+            : new Date(lastVisitedDate).toLocaleString("en-GB", {
+                timeZone: timezone || "UTC",
+                hour12: true,
+              }),
         updatedAt: now,
         screenResolution,
         browserVersion,
@@ -133,6 +132,7 @@ const addVisitor = async (req, res) => {
         pixelRatio,
         sessionId,
         isOwner: !!isOwner,
+        geo: geo || null,
       },
       $setOnInsert: {
         createdAt: now,
@@ -147,7 +147,6 @@ const addVisitor = async (req, res) => {
       options
     );
 
-    // result.value will contain the updated document
     res.status(200).json({
       success: true,
       message: "Visitor data processed successfully.",
